@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 function Pane(props) {
-  const size = props.size || 0;
-  const unit = props.percentage ? '%' : 'px';
+  const { children, percentage, primary, size, vertical, ...rest } = props;
+
+  const unit = percentage ? '%' : 'px';
   let classes = 'layout-pane';
   const style = {};
-  if (!props.primary) {
-    if (props.vertical) {
+  if (!primary) {
+    if (vertical) {
       style.height = `${size}${unit}`;
     } else {
       style.width = `${size}${unit}`;
@@ -16,7 +17,13 @@ function Pane(props) {
     classes += ' layout-pane-primary';
   }
   return (
-    <div className={classes} style={style}>{props.children}</div>
+    <div
+      {...rest}
+      className={classes}
+      style={style}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -35,7 +42,7 @@ Pane.defaultProps = {
   vertical: false,
   primary: false,
   size: 0,
-  percentage: false,
+  percentage: true,
   children: []
 };
 

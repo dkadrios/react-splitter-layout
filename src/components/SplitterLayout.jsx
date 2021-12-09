@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { nanoid } from 'nanoid';
 import Pane from './Pane';
+
+const percentage = true;
 
 function clearSelection() {
   if (document.body.createTextRange) {
@@ -30,6 +33,7 @@ class SplitterLayout extends React.Component {
     this.handleMouseUp = this.handleMouseUp.bind(this);
     this.handleTouchMove = this.handleTouchMove.bind(this);
     this.handleSplitterMouseDown = this.handleSplitterMouseDown.bind(this);
+    this.handleSplitterKeyboardEvent = this.handleSplitterKeyboardEvent.bind(this);
     this.state = {
       secondaryPaneSize: 0,
       resizing: false
@@ -60,7 +64,10 @@ class SplitterLayout extends React.Component {
         top: containerRect.top + ((containerRect.height - splitterRect.height) / 2)
       }, false);
     }
-    this.setState({ secondaryPaneSize });
+    this.setState({
+      primaryPaneId: nanoid(),
+      secondaryPaneSize
+    });
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -115,7 +122,7 @@ class SplitterLayout extends React.Component {
       secondaryPaneSize = totalSize - splitterSize - offset;
     }
     let primaryPaneSize = totalSize - splitterSize - secondaryPaneSize;
-    if (this.props.percentage) {
+    if (percentage) {
       secondaryPaneSize = (secondaryPaneSize * 100) / totalSize;
       primaryPaneSize = (primaryPaneSize * 100) / totalSize;
       splitterSize = (splitterSize * 100) / totalSize;
@@ -132,7 +139,7 @@ class SplitterLayout extends React.Component {
   }
 
   handleResize() {
-    if (this.splitter && !this.props.percentage) {
+    if (this.splitter && !percentage) {
       const containerRect = this.container.getBoundingClientRect();
       const splitterRect = this.splitter.getBoundingClientRect();
       const secondaryPaneSize = this.getSecondaryPaneSize(containerRect, splitterRect, {
@@ -169,6 +176,24 @@ class SplitterLayout extends React.Component {
     this.setState(prevState => (prevState.resizing ? { resizing: false } : null));
   }
 
+  handleSplitterKeyboardEvent(event) {
+    const key = event.which || event.keyCode;
+    const { keyboardStep: step } = this.props;
+    switch (key) {
+      case 37:
+        if (this.state.secondaryPaneSize <= (100 - step)) {
+          this.setState(prevState => ({ secondaryPaneSize: prevState.secondaryPaneSize + step }));
+        }
+        break;
+      case 39:
+        if (this.state.secondaryPaneSize >= (step)) {
+          this.setState(prevState => ({ secondaryPaneSize: prevState.secondaryPaneSize - step }));
+        }
+        break;
+      default:
+    }
+  }
+
   render() {
     let containerClasses = 'splitter-layout';
     if (this.props.customClassName) {
@@ -195,7 +220,15 @@ class SplitterLayout extends React.Component {
         size = this.state.secondaryPaneSize;
       }
       wrappedChildren.push(
-        <Pane vertical={this.props.vertical} percentage={this.props.percentage} primary={primary} size={size}>
+        <Pane
+          vertical={this.props.vertical}
+          percentage={percentage}
+          primary={primary}
+          size={size}
+          {...(primary) ? {
+            id: this.state.primaryPaneId
+          } : null}
+        >
           {children[i]}
         </Pane>
       );
@@ -206,13 +239,22 @@ class SplitterLayout extends React.Component {
         {wrappedChildren[0]}
         {wrappedChildren.length > 1 &&
           (
+            // eslint-disable-next-line jsx-a11y/role-supports-aria-props
             <div
+              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+              tabIndex={0}
+              aria-label="splitter"
               {...this.props.splitterProps}
+              aria-controls={this.state.primaryPaneId}
+              aria-valuemin={this.props.primaryMinSize}
+              aria-valuemax={100 - this.props.secondaryMinSize}
+              aria-valuenow={Math.round(100 - this.state.secondaryPaneSize)}
               role="separator"
               className="layout-splitter"
               ref={(c) => { this.splitter = c; }}
               onMouseDown={this.handleSplitterMouseDown}
               onTouchStart={this.handleSplitterMouseDown}
+              onKeyUp={this.handleSplitterKeyboardEvent}
             />
           )
         }
@@ -224,8 +266,8 @@ class SplitterLayout extends React.Component {
 
 SplitterLayout.propTypes = {
   customClassName: PropTypes.string,
+  keyboardStep: PropTypes.number,
   vertical: PropTypes.bool,
-  percentage: PropTypes.bool,
   primaryIndex: PropTypes.number,
   primaryMinSize: PropTypes.number,
   secondaryInitialSize: PropTypes.number,
@@ -240,8 +282,8 @@ SplitterLayout.propTypes = {
 
 SplitterLayout.defaultProps = {
   customClassName: '',
+  keyboardStep: 5,
   vertical: false,
-  percentage: false,
   primaryIndex: 0,
   primaryMinSize: 0,
   secondaryInitialSize: undefined,
