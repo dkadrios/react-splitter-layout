@@ -207,6 +207,7 @@ class SplitterLayout extends React.Component {
         {wrappedChildren.length > 1 &&
           (
             <div
+              {...this.props.splitterProps}
               role="separator"
               className="layout-splitter"
               ref={(c) => { this.splitter = c; }}
@@ -229,6 +230,8 @@ SplitterLayout.propTypes = {
   primaryMinSize: PropTypes.number,
   secondaryInitialSize: PropTypes.number,
   secondaryMinSize: PropTypes.number,
+  // eslint-disable-next-line react/forbid-prop-types
+  splitterProps: PropTypes.object,
   onDragStart: PropTypes.func,
   onDragEnd: PropTypes.func,
   onSecondaryPaneSizeChange: PropTypes.func,
@@ -243,6 +246,7 @@ SplitterLayout.defaultProps = {
   primaryMinSize: 0,
   secondaryInitialSize: undefined,
   secondaryMinSize: 0,
+  splitterProps: undefined,
   onDragStart: null,
   onDragEnd: null,
   onSecondaryPaneSizeChange: null,

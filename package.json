@@ -1,6 +1,6 @@
 {
-  "name": "react-splitter-layout",
-  "version": "4.0.0",
+  "name": "@studysync/react-splitter-layout",
+  "version": "4.0.1",
   "description": "A simple split layout for React and modern browsers",
   "keywords": [
     "react",
