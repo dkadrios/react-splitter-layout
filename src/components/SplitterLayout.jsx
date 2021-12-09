@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid';
 import Pane from './Pane';
 
 const percentage = true;
+const assertRange = (value, min, max) => Math.min(Math.max(value, min), max) || min;
 
 function clearSelection() {
   if (document.body.createTextRange) {
@@ -178,17 +179,19 @@ class SplitterLayout extends React.Component {
 
   handleSplitterKeyboardEvent(event) {
     const key = event.which || event.keyCode;
-    const { keyboardStep: step } = this.props;
+    const { keyboardStep: step, primaryMinSize: min } = this.props;
+    const max = 100 - min;
+
     switch (key) {
       case 37:
-        if (this.state.secondaryPaneSize <= (100 - step)) {
-          this.setState(prevState => ({ secondaryPaneSize: prevState.secondaryPaneSize + step }));
-        }
+        this.setState(prevState => ({
+          secondaryPaneSize: assertRange(prevState.secondaryPaneSize + step, min, max)
+        }));
         break;
       case 39:
-        if (this.state.secondaryPaneSize >= (step)) {
-          this.setState(prevState => ({ secondaryPaneSize: prevState.secondaryPaneSize - step }));
-        }
+        this.setState(prevState => ({
+          secondaryPaneSize: assertRange(prevState.secondaryPaneSize - step, min, max)
+        }));
         break;
       default:
     }
