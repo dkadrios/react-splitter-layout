@@ -249,6 +249,7 @@ class SplitterLayout extends React.Component {
               aria-label="splitter"
               {...this.props.splitterProps}
               aria-controls={this.state.primaryPaneId}
+              aria-orientation={this.props.vertical ? 'horizontal' : 'vertical'}
               aria-valuemin={this.props.primaryMinSize}
               aria-valuemax={100 - this.props.secondaryMinSize}
               aria-valuenow={Math.round(100 - this.state.secondaryPaneSize)}
