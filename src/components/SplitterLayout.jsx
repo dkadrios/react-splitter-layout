@@ -134,13 +134,20 @@ class SplitterLayout extends React.Component {
       secondaryPaneSize = Math.max(secondaryPaneSize - (this.props.primaryMinSize - primaryPaneSize), 0);
     } else if (secondaryPaneSize < this.props.secondaryMinSize) {
       secondaryPaneSize = Math.min(totalSize - splitterSize - this.props.primaryMinSize, this.props.secondaryMinSize);
+    } else if (secondaryPaneSize > this.props.secondaryMaxSize) {
+      secondaryPaneSize = Math.min(totalSize - splitterSize - this.props.primaryMinSize, this.props.secondaryMaxSize);
+    }
+
+    if (this.props.secondaryMaxSize) {
+      secondaryPaneSize = (this.props.secondaryMaxSize * 100) / containerRect.width;
+      primaryPaneSize = totalSize - splitterSize - secondaryPaneSize;
     }
 
     return secondaryPaneSize;
   }
 
   handleResize() {
-    if (this.splitter && !percentage) {
+    if (this.splitter && (!percentage || this.props.secondaryMaxSize)) {
       const containerRect = this.container.getBoundingClientRect();
       const splitterRect = this.splitter.getBoundingClientRect();
       const secondaryPaneSize = this.getSecondaryPaneSize(containerRect, splitterRect, {
@@ -275,6 +282,7 @@ SplitterLayout.propTypes = {
   primaryIndex: PropTypes.number,
   primaryMinSize: PropTypes.number,
   secondaryInitialSize: PropTypes.number,
+  secondaryMaxSize: PropTypes.number,
   secondaryMinSize: PropTypes.number,
   // eslint-disable-next-line react/forbid-prop-types
   splitterProps: PropTypes.object,
@@ -291,6 +299,7 @@ SplitterLayout.defaultProps = {
   primaryIndex: 0,
   primaryMinSize: 0,
   secondaryInitialSize: undefined,
+  secondaryMaxSize: undefined,
   secondaryMinSize: 0,
   splitterProps: undefined,
   onDragStart: null,
