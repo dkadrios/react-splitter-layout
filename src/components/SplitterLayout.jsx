@@ -71,6 +71,7 @@ class SplitterLayout extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    if (!this.props.enabled) return;
     if (prevState.secondaryPaneSize !== this.state.secondaryPaneSize && this.props.onSecondaryPaneSizeChange) {
       this.props.onSecondaryPaneSizeChange(this.state.secondaryPaneSize);
     }
@@ -146,6 +147,7 @@ class SplitterLayout extends React.Component {
   }
 
   handleResize() {
+    if (!this.props.enabled) return;
     if (this.splitter && (!percentage || this.props.secondaryMaxSize)) {
       const containerRect = this.container.getBoundingClientRect();
       const splitterRect = this.splitter.getBoundingClientRect();
@@ -158,6 +160,7 @@ class SplitterLayout extends React.Component {
   }
 
   handleMouseMove(e) {
+    if (!this.props.enabled) return;
     if (this.state.resizing) {
       const containerRect = this.container.getBoundingClientRect();
       const splitterRect = this.splitter.getBoundingClientRect();
@@ -171,19 +174,23 @@ class SplitterLayout extends React.Component {
   }
 
   handleTouchMove(e) {
+    if (!this.props.enabled) return;
     this.handleMouseMove(e.changedTouches[0]);
   }
 
   handleSplitterMouseDown() {
+    if (!this.props.enabled) return;
     clearSelection();
     this.setState({ resizing: true });
   }
 
   handleMouseUp() {
+    if (!this.props.enabled) return;
     this.setState(prevState => (prevState.resizing ? { resizing: false } : null));
   }
 
   handleSplitterKeyboardEvent(event) {
+    if (!this.props.enabled) return;
     const key = event.which || event.keyCode;
     const { keyboardStep: step, primaryMinSize: min } = this.props;
     const max = 100 - min;
@@ -221,32 +228,35 @@ class SplitterLayout extends React.Component {
     }
     const wrappedChildren = [];
     const primaryIndex = (this.props.primaryIndex !== 0 && this.props.primaryIndex !== 1) ? 0 : this.props.primaryIndex;
-    for (let i = 0; i < children.length; ++i) {
-      let primary = true;
-      let size = null;
-      if (children.length > 1 && i !== primaryIndex) {
-        primary = false;
-        size = this.state.secondaryPaneSize;
+    if (this.props.enabled) {
+      for (let i = 0; i < children.length; ++i) {
+        let primary = true;
+        let size = null;
+        if (children.length > 1 && i !== primaryIndex) {
+          primary = false;
+          size = this.state.secondaryPaneSize;
+        }
+        wrappedChildren.push(
+          <Pane
+            vertical={this.props.vertical}
+            percentage={percentage}
+            primary={primary}
+            size={size}
+            {...(primary) ? {
+              id: this.state.primaryPaneId
+            } : null}
+          >
+            {children[i]}
+          </Pane>
+        );
       }
-      wrappedChildren.push(
-        <Pane
-          vertical={this.props.vertical}
-          percentage={percentage}
-          primary={primary}
-          size={size}
-          {...(primary) ? {
-            id: this.state.primaryPaneId
-          } : null}
-        >
-          {children[i]}
-        </Pane>
-      );
     }
 
-    return (
-      <div className={containerClasses} ref={(c) => { this.container = c; }}>
-        {wrappedChildren[0]}
-        {wrappedChildren.length > 1 &&
+    return this.props.enabled ?
+      (
+        <div className={containerClasses} ref={(c) => { this.container = c; }}>
+          {wrappedChildren[0]}
+          {wrappedChildren.length > 1 &&
           (
             // eslint-disable-next-line jsx-a11y/role-supports-aria-props
             <div
@@ -268,14 +278,53 @@ class SplitterLayout extends React.Component {
             />
           )
         }
-        {wrappedChildren.length > 1 && wrappedChildren[1]}
-      </div>
-    );
+          {wrappedChildren.length > 1 && wrappedChildren[1]}
+        </div>
+      ) :
+      (
+        <div
+          className={`${containerClasses} .splitter-disabled`}
+          ref={(c) => { this.container = c; }}
+        >
+
+          {children.map((child, idx) => {
+            let primary = true;
+            if (children.length > 1 && idx !== primaryIndex) {
+              primary = false;
+            }
+            let className = 'layout-pane';
+            if (primary) {
+              className += ' layout-pane-primary';
+            }
+            return (
+              <div
+                className={className}
+                // eslint-disable-next-line react/no-array-index-key
+                key={`splitter-child-${idx}`}
+                {...(primary) ? {
+                  id: this.state.primaryPaneId
+                } : null}
+              >
+                {children[idx]}
+              </div>
+            );
+          })}
+
+          {/* <div
+            {...this.props.splitterProps}
+            className="layout-splitter"
+            ref={(c) => { this.splitter = c; }}
+            style={{ display: 'hidden !important' }}
+          /> */}
+
+        </div>
+      );
   }
 }
 
 SplitterLayout.propTypes = {
   customClassName: PropTypes.string,
+  enabled: PropTypes.bool,
   keyboardStep: PropTypes.number,
   vertical: PropTypes.bool,
   primaryIndex: PropTypes.number,
@@ -293,6 +342,7 @@ SplitterLayout.propTypes = {
 
 SplitterLayout.defaultProps = {
   customClassName: '',
+  enabled: true,
   keyboardStep: 5,
   vertical: false,
   primaryIndex: 0,

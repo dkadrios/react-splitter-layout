@@ -3,9 +3,14 @@ import SplitterLayout from '../../../index';
 import Lorem from './Lorem';
 
 export default function() {
+  const [enabled, setEnabled] = React.useState(true);
   return (
-    <SplitterLayout>
+    <SplitterLayout enabled={enabled}>
       <div className="my-pane">
+        <div>
+          {enabled ? 'enabled' : 'disabled'}
+          <button type="button" onClick={() => setEnabled(current => !current)}>toggle</button>
+        </div>
         <h2>1st Pane</h2>
         <p>This is the 1st pane, and this is the primary pane by default.</p>
         <p>Try to resize the window and see how secondary pane&apos;s size keeps.</p>
