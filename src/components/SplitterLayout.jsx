@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { nanoid } from 'nanoid';
 import Pane from './Pane';
 
 const percentage = true;
@@ -66,7 +65,7 @@ class SplitterLayout extends React.Component {
       }, false);
     }
     this.setState({
-      primaryPaneId: nanoid(),
+      primaryPaneId: '2112',
       secondaryPaneSize
     });
   }
