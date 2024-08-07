@@ -12,10 +12,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/zesik/react-splitter-layout"
-  },
-  "bugs": {
-    "url": "https://github.com/zesik/react-splitter-layout/issues"
+    "url": "https://github.com/dkadrios/react-splitter-layout"
   },
   "main": "lib/index.js",
   "files": [
