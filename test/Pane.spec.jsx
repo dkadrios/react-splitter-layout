@@ -10,7 +10,7 @@ function render(content, props = {}) {
 
 describe('Pane', () => {
   it('should render a Pane correctly', () => {
-    const output = render('test pane');
+    const output = render('test pane', { percentage: false });
     expect(output.type).toBe('div');
     expect(output.props.className).toBe('layout-pane');
     expect(output.props.style).toEqual({ width: '0px' });

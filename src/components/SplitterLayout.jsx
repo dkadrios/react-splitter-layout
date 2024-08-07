@@ -1,3 +1,4 @@
+/* eslint-disable react/require-default-props */
 import React from 'react';
 import PropTypes from 'prop-types';
 import Pane from './Pane';
@@ -27,16 +28,18 @@ const DEFAULT_SPLITTER_SIZE = 4;
 
 class SplitterLayout extends React.Component {
   constructor(props) {
-    super(props);
+    const assertedProps = Object.assign({}, props);
 
-    this.props.customClassName = props.customClassName ?? '';
-    this.props.enabled = props.enabled ?? true;
-    this.props.keyboardStep = props.keyboardStep ?? 5;
-    this.props.vertical = props.vertical ?? false;
-    this.props.primaryIndex = props.primaryIndex ?? 0;
-    this.props.primaryMinSize = props.primaryMinSize ?? 0;
-    this.props.secondaryMinSize = props.secondaryMinSize ?? 0;
-    this.props.children = props.children ?? [];
+    assertedProps.customClassName = props.customClassName || '';
+    assertedProps.enabled = props.enabled === undefined ? true : props.enabled;
+    assertedProps.keyboardStep = props.keyboardStep || 5;
+    assertedProps.vertical = !!props.vertical;
+    assertedProps.primaryIndex = props.primaryIndex || 0;
+    assertedProps.primaryMinSize = props.primaryMinSize || 0;
+    assertedProps.secondaryMinSize = props.secondaryMinSize || 0;
+    assertedProps.children = props.children || [];
+
+    super(props);
 
     this.handleResize = this.handleResize.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
