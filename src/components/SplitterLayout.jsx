@@ -39,7 +39,7 @@ class SplitterLayout extends React.Component {
     assertedProps.secondaryMinSize = props.secondaryMinSize || 0;
     assertedProps.children = props.children || [];
 
-    super(props);
+    super(assertedProps);
 
     this.handleResize = this.handleResize.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
