@@ -28,6 +28,16 @@ const DEFAULT_SPLITTER_SIZE = 4;
 class SplitterLayout extends React.Component {
   constructor(props) {
     super(props);
+
+    this.props.customClassName = props.customClassName ?? '';
+    this.props.enabled = props.enabled ?? true;
+    this.props.keyboardStep = props.keyboardStep ?? 5;
+    this.props.vertical = props.vertical ?? false;
+    this.props.primaryIndex = props.primaryIndex ?? 0;
+    this.props.primaryMinSize = props.primaryMinSize ?? 0;
+    this.props.secondaryMinSize = props.secondaryMinSize ?? 0;
+    this.props.children = props.children ?? [];
+
     this.handleResize = this.handleResize.bind(this);
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.handleMouseUp = this.handleMouseUp.bind(this);
@@ -338,23 +348,6 @@ SplitterLayout.propTypes = {
   onDragEnd: PropTypes.func,
   onSecondaryPaneSizeChange: PropTypes.func,
   children: PropTypes.arrayOf(PropTypes.node)
-};
-
-SplitterLayout.defaultProps = {
-  customClassName: '',
-  enabled: true,
-  keyboardStep: 5,
-  vertical: false,
-  primaryIndex: 0,
-  primaryMinSize: 0,
-  secondaryInitialSize: undefined,
-  secondaryMaxSize: undefined,
-  secondaryMinSize: 0,
-  splitterProps: undefined,
-  onDragStart: null,
-  onDragEnd: null,
-  onSecondaryPaneSizeChange: null,
-  children: []
 };
 
 export default SplitterLayout;
